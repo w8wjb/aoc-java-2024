@@ -77,7 +77,7 @@ public class Day4 {
             }
 
             int diagCount = 0;
-            // For each starting 'M', check the opposite side for an 'S'
+            // For each starting 'M', check diagonally for an 'S'
             // This should exclude the case where the 'M's are opposite of each other
             for (Vector start : starts) {
                 Point opposite = center.add(start.inverted());
