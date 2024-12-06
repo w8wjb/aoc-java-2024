@@ -8,6 +8,7 @@ import org.tot.aoc.grid.Vector;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class Day6 {
 
@@ -28,21 +29,20 @@ public class Day6 {
 
         Set<Point> visitedPoints = walkRoute(grid, startPose);
 
-        int count = 0;
+        AtomicInteger count = new AtomicInteger();
 
-        for (Point potentialObstruction : visitedPoints) {
+        visitedPoints.parallelStream().forEach(potentialObstruction -> {
             var alternateGrid = new HashGrid<>(grid);
             alternateGrid.put(potentialObstruction, '#');
 
             try {
                 walkRoute(alternateGrid, startPose);
             } catch (RouteLoopException e) {
-                count++;
+                count.incrementAndGet();
             }
-        }
+        });
 
-
-        return count;
+        return count.get();
     }
 
     private GuardPose findStart(HashGrid<Character> grid) {

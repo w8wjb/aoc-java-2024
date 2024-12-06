@@ -41,8 +41,8 @@ public class HashGrid<V> extends HashMap<Point, V>  implements Iterable<Point> {
             }
         }
         HashGrid<Character> grid = new HashGrid<>(points);
-        grid.maxY = rows.size() - 1;
-        grid.maxX = rows.get(0).length() - 1;
+        grid.maxY = rows.size() - 1L;
+        grid.maxX = rows.get(0).length() - 1L;
         grid.empty = empty;
         return grid;
     }
