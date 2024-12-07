@@ -48,7 +48,10 @@ public class Day7 {
         Operator[] operators = new Operator[]{
                 Long::sum,
                 (l, r) -> l * r,
-                (l, r) -> Long.valueOf(l + String.valueOf(r))
+                (l, r) -> {
+                    long numDigits = (int) Math.log10(r) + 1;
+                    return l * ((long) Math.pow(10, numDigits)) + r;
+                }
         };
 
         var equations = parseInput(input, operators);
