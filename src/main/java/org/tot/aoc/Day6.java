@@ -3,53 +3,20 @@ package org.tot.aoc;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.tot.aoc.grid.HashGrid;
 import org.tot.aoc.grid.Point;
-import org.tot.aoc.grid.StringGrid;
 import org.tot.aoc.grid.Vector;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class Day6 {
 
-
-    public static final List<Vector> legalMoves = List.of(
-            Vector.N, Vector.E, Vector.S, Vector.W
-    );
-
-    private Vector turnRight(Vector from) {
-        int next = (legalMoves.indexOf(from) + 1) % legalMoves.size();
-        return legalMoves.get(next);
-    }
-
     public int solvePuzzle1(List<String> input) {
 
-        var grid = new StringGrid(input);
-        var visited = new HashSet<Point>();
-
-        Point guardPosition = null;
-        Vector guardDirection = Vector.N;
-
-        for (Point p : grid) {
-            if (grid.get(p) == '^') {
-                guardPosition = p;
-                break;
-            }
-        }
-        assert guardPosition != null;
-
-        while (grid.isWithinBounds(guardPosition)) {
-            visited.add(guardPosition);
-
-            var nextPosition = guardPosition.add(guardDirection);
-            while (grid.get(nextPosition) == '#') {
-                guardDirection = turnRight(guardDirection);
-                nextPosition = guardPosition.add(guardDirection);
-            }
-
-            guardPosition = nextPosition;
-        }
-
+        var grid = HashGrid.fromList(input);
+        GuardPose startPose = findStart(grid);
+        var visited = walkRoute(grid, startPose);
 
         return visited.size();
     }
@@ -62,21 +29,20 @@ public class Day6 {
 
         Set<Point> visitedPoints = walkRoute(grid, startPose);
 
-        int count = 0;
+        AtomicInteger count = new AtomicInteger();
 
-        for (Point potentialObstruction : visitedPoints) {
+        visitedPoints.parallelStream().forEach(potentialObstruction -> {
             var alternateGrid = new HashGrid<>(grid);
             alternateGrid.put(potentialObstruction, '#');
 
             try {
                 walkRoute(alternateGrid, startPose);
             } catch (RouteLoopException e) {
-                count++;
+                count.incrementAndGet();
             }
-        }
+        });
 
-
-        return count;
+        return count.get();
     }
 
     private GuardPose findStart(HashGrid<Character> grid) {
@@ -85,7 +51,7 @@ public class Day6 {
                 return new GuardPose(p, Vector.N);
             }
         }
-        throw new IllegalStateException("Staring point not found");
+        throw new IllegalStateException("Starting point not found");
     }
 
     private Set<Point> walkRoute(HashGrid<Character> grid, GuardPose start) {
@@ -117,6 +83,10 @@ public class Day6 {
     }
 
     static class GuardPose {
+
+        private static final List<Vector> legalMoves = List.of(
+                Vector.N, Vector.E, Vector.S, Vector.W
+        );
 
         Point position;
         Vector facing;
@@ -175,7 +145,6 @@ public class Day6 {
     }
 
     private static class RouteLoopException extends RuntimeException {
-
         public RouteLoopException(String message) {
             super(message);
         }

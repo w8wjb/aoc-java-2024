@@ -19,8 +19,8 @@ public class StringGrid implements Iterable<Point> {
 
     public StringGrid(List<String> rows) {
         this.rows = rows;
-        this.maxY = rows.size() - 1;
-        this.maxX = rows.get(0).length() - 1;
+        this.maxY = rows.size() - 1L;
+        this.maxX = rows.get(0).length() - 1L;
     }
 
     /**
