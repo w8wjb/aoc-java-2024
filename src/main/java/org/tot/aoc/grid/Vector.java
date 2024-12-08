@@ -23,6 +23,14 @@ public class Vector {
         this.y = y;
     }
 
+    public long getX() {
+        return x;
+    }
+
+    public long getY() {
+        return y;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof Vector) {
