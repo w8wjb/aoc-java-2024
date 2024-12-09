@@ -52,7 +52,7 @@ public class Day9Test {
 
         long result = day.solvePuzzle2(lines.get(0));
 
-        Assert.assertEquals(1339, result);
+        Assert.assertEquals(6227018762750L, result);
     }
 
 }
