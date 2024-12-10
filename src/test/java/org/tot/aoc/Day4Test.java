@@ -28,7 +28,7 @@ public class Day4Test {
 
         int result = day.solvePuzzle1(lines);
 
-        Assert.assertEquals(178538786, result);
+        Assert.assertEquals(2514, result);
     }
 
     @Test
