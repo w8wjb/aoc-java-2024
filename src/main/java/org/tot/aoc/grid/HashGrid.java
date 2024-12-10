@@ -1,6 +1,7 @@
 package org.tot.aoc.grid;
 
 import java.util.*;
+import java.util.function.Function;
 
 public class HashGrid<V> extends HashMap<Point, V>  implements Iterable<Point> {
 
@@ -41,6 +42,27 @@ public class HashGrid<V> extends HashMap<Point, V>  implements Iterable<Point> {
             }
         }
         HashGrid<Character> grid = new HashGrid<>(points);
+        grid.maxY = rows.size() - 1L;
+        grid.maxX = rows.get(0).length() - 1L;
+        grid.empty = empty;
+        return grid;
+    }
+
+    public static <V> HashGrid<V> fromList(List<String> rows, Function<Character, V> converter, V empty) {
+
+        Map<Point, V> points = new HashMap<>();
+
+        for (int y = 0; y < rows.size(); y++) {
+            char[] row = rows.get(y).toCharArray();
+            for (int x = 0; x < row.length; x++) {
+                V value = converter.apply(row[x]);
+                if (value == empty) {
+                    continue;
+                }
+                points.put(new Point(x,y), value);
+            }
+        }
+        HashGrid<V> grid = new HashGrid<V>(points);
         grid.maxY = rows.size() - 1L;
         grid.maxX = rows.get(0).length() - 1L;
         grid.empty = empty;
