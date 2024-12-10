@@ -50,11 +50,12 @@ public class Day9 {
 
     public long solvePuzzle2(String input) {
 
+        int bucketCount = 10;
 
         List<File> files = new ArrayList<>();
-        List<SortedSet<Integer>> freeSpaceBuckets = new ArrayList<>(10);
+        List<SortedSet<Integer>> freeSpaceBuckets = new ArrayList<>(bucketCount);
 
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < bucketCount; i++) {
             freeSpaceBuckets.add(new TreeSet<>());
         }
 
@@ -80,42 +81,58 @@ public class Day9 {
         Collections.reverse(files);
 
         for (File file : files) {
-            int sizeNeeded = file.size;
 
-            nextSize:
-            for (int size = sizeNeeded; size < freeSpaceBuckets.size(); size++) {
+            int spaceIndex = Integer.MAX_VALUE;
+            int selectedSize = bucketCount;
+            SortedSet<Integer> selectedBucket = null;
+
+            for (int size = file.size; size < bucketCount; size++) {
                 var bucket = freeSpaceBuckets.get(size);
-                if (!bucket.isEmpty()) {
-                    int spaceIndex = bucket.first();
-                    while (spaceIndex > file.index) {
-                        bucket.remove(spaceIndex);
-                        if (bucket.isEmpty()) {
-                            continue nextSize;
-                        }
-                        spaceIndex = bucket.first();
-                    }
-
-                    file.index = spaceIndex;
-                    bucket.remove(file.index);
-
-                    int leftoverSpace = size - sizeNeeded;
-                    if (leftoverSpace > 0) {
-                        spaceIndex += sizeNeeded;
-                        freeSpaceBuckets.get(leftoverSpace).add(spaceIndex);
-                    }
-                    break;
+                if (bucket.isEmpty()) {
+                    continue;
+                }
+                var first = bucket.first();
+                if (first < spaceIndex) {
+                    selectedBucket = bucket;
+                    selectedSize = size;
+                    spaceIndex = first;
                 }
             }
+
+            if (selectedBucket == null) {
+                // Can't move this file
+                continue;
+            }
+
+            file.index = spaceIndex;
+            selectedBucket.remove(file.index);
+
+            int leftoverSpace = selectedSize - file.size;
+            if (leftoverSpace > 0) {
+                freeSpaceBuckets.get(leftoverSpace).add(spaceIndex + file.size);
+            }
+
 
 //            printFilesystem(files);
         }
 
         files.sort(Comparator.comparing(File::getIndex));
-        printFilesystem(files);
-        
+//        printFilesystem(files);
+
+        for (int i = 0; i < files.size(); i++) {
+            File file = files.get(i);
+            int nextIdx = i + 1;
+            if (nextIdx < files.size()) {
+                int space = files.get(nextIdx).index - file.index;
+                System.out.printf("%d %d%n", file.id, space);
+            } else {
+                System.out.printf("%d 0%n", file.id);
+            }
+        }
+
         long checksum = 0;
         for (File file : files) {
-            for (int i=file.index; i< file.index + file.size; i++) {
+            for (int i = file.index; i < file.index + file.size; i++) {
                 checksum += (i * file.id);
             }
         }
@@ -128,12 +145,12 @@ public class Day9 {
         int prevIdx = 0;
         for (File file : files) {
             int spaceCount = file.index - prevIdx;
-            for (int i= 0; i < spaceCount; i++) {
+            for (int i = 0; i < spaceCount; i++) {
                 System.out.print('.');
             }
 
             prevIdx = file.index;
-            for (int i=file.index; i< file.index + file.size; i++) {
+            for (int i = file.index; i < file.index + file.size; i++) {
                 System.out.print(file.id);
                 prevIdx++;
             }
@@ -155,6 +172,11 @@ public class Day9 {
 
         public int getIndex() {
             return index;
+        }
+
+        @Override
+        public String toString() {
+            return String.format("%d @ %d %db", id, index, size);
         }
     }
 
