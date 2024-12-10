@@ -50,48 +50,58 @@ public class Day9 {
 
     public long solvePuzzle2(String input) {
 
-        int bucketCount = 10;
+        final int bucketCount = 10;
 
         List<File> files = new ArrayList<>();
-        List<SortedSet<Integer>> freeSpaceBuckets = new ArrayList<>(bucketCount);
 
+        // Set up 9 buckets to hold the indexes to chunks of free space
+        List<SortedSet<Integer>> freeSpaceBuckets = new ArrayList<>(bucketCount);
         for (int i = 0; i < bucketCount; i++) {
             freeSpaceBuckets.add(new TreeSet<>());
         }
 
+        // Convert the characters into an array of integers
         int[] diskMap = CharBuffer.wrap(input)
                 .chars()
                 .map(c -> c - 48)
                 .toArray();
 
+        // Loop through the "compressed" sizes and create
+        // either File objects add the space to a bucket
         int fileIndex = 0;
         for (int i = 0; i < diskMap.length; i++) {
             int size = diskMap[i];
             if ((i % 2) == 0) {
-                var block = new File(i / 2, size, fileIndex);
-                files.add(block);
+                var file = new File(i / 2, size, fileIndex);
+                files.add(file);
             } else if (size > 0) {
                 freeSpaceBuckets.get(size).add(fileIndex);
             }
             fileIndex += size;
         }
 
-        System.out.println("Defragging...");
-
+        // Reverse the list of files in order to process from highest file ID to lowest
         Collections.reverse(files);
 
+        // Move files one by one
         for (File file : files) {
 
-            int spaceIndex = Integer.MAX_VALUE;
+            // This is important. This sets the maximum index of where space can be found.
+            int spaceIndex = file.index;
+
             int selectedSize = bucketCount;
             SortedSet<Integer> selectedBucket = null;
 
+            // Look through all the buckets with sizes that can accomodate the file
             for (int size = file.size; size < bucketCount; size++) {
                 var bucket = freeSpaceBuckets.get(size);
                 if (bucket.isEmpty()) {
+                    // Skip empty buckets
                     continue;
                 }
                 var first = bucket.first();
+                // Choose the bucket that has the index closest to the beginning
+                // this won't always be an exact fit.
                 if (first < spaceIndex) {
                     selectedBucket = bucket;
                     selectedSize = size;
@@ -100,36 +110,27 @@ public class Day9 {
             }
 
             if (selectedBucket == null) {
-                // Can't move this file
+                // Can't move this file; no space
                 continue;
             }
 
+            // Update the location of the file to be the start of the free space
             file.index = spaceIndex;
+            // Remove the space index from the bucket
             selectedBucket.remove(file.index);
 
+            // Add the leftover space to a different bucket
             int leftoverSpace = selectedSize - file.size;
             if (leftoverSpace > 0) {
                 freeSpaceBuckets.get(leftoverSpace).add(spaceIndex + file.size);
             }
-
-
-//            printFilesystem(files);
         }
 
+        // Now that the files have been "moved", i.e. their indexes changed,
+        // sort them in order by index
         files.sort(Comparator.comparing(File::getIndex));
-//        printFilesystem(files);
 
-        for (int i = 0; i < files.size(); i++) {
-            File file = files.get(i);
-            int nextIdx = i + 1;
-            if (nextIdx < files.size()) {
-                int space = files.get(nextIdx).index - file.index;
-                System.out.printf("%d %d%n", file.id, space);
-            } else {
-                System.out.printf("%d 0%n", file.id);
-            }
-        }
-
+        // Compute the checksum
         long checksum = 0;
         for (File file : files) {
             for (int i = file.index; i < file.index + file.size; i++) {
