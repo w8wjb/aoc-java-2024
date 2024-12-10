@@ -5,9 +5,6 @@ import java.util.*;
 
 public class Day9 {
 
-    List<FileBlock> filesystem = new ArrayList<>();
-
-    int seekRangeStart = 0;
 
     public long solvePuzzle1(String input) {
 
@@ -53,125 +50,111 @@ public class Day9 {
 
     public long solvePuzzle2(String input) {
 
+
+        List<File> files = new ArrayList<>();
+        List<SortedSet<Integer>> freeSpaceBuckets = new ArrayList<>(10);
+
+        for (int i = 0; i < 10; i++) {
+            freeSpaceBuckets.add(new TreeSet<>());
+        }
+
         int[] diskMap = CharBuffer.wrap(input)
                 .chars()
                 .map(c -> c - 48)
                 .toArray();
 
-        long maxFileId = 0;
-        for (int i = 0; i < diskMap.length; i += 2) {
-            maxFileId = i / 2;
+        int fileIndex = 0;
+        for (int i = 0; i < diskMap.length; i++) {
             int size = diskMap[i];
-            int free = (i + 1) < diskMap.length ? diskMap[i + 1] : 0;
-            filesystem.add(new FileBlock(maxFileId, size, free));
+            if ((i % 2) == 0) {
+                var block = new File(i / 2, size, fileIndex);
+                files.add(block);
+            } else if (size > 0) {
+                freeSpaceBuckets.get(size).add(fileIndex);
+            }
+            fileIndex += size;
         }
-
-        int seekRangeEnd = filesystem.size() - 1;
-
 
         System.out.println("Defragging...");
 
-        for (long fileId = maxFileId; fileId > 0; fileId--) {
+        Collections.reverse(files);
 
-            if (fileId % 100 == 0) {
-                System.out.println(fileId);
+        for (File file : files) {
+            int sizeNeeded = file.size;
+
+            nextSize:
+            for (int size = sizeNeeded; size < freeSpaceBuckets.size(); size++) {
+                var bucket = freeSpaceBuckets.get(size);
+                if (!bucket.isEmpty()) {
+                    int spaceIndex = bucket.first();
+                    while (spaceIndex > file.index) {
+                        bucket.remove(spaceIndex);
+                        if (bucket.isEmpty()) {
+                            continue nextSize;
+                        }
+                        spaceIndex = bucket.first();
+                    }
+
+                    file.index = spaceIndex;
+                    bucket.remove(file.index);
+
+                    int leftoverSpace = size - sizeNeeded;
+                    if (leftoverSpace > 0) {
+                        spaceIndex += sizeNeeded;
+                        freeSpaceBuckets.get(leftoverSpace).add(spaceIndex);
+                    }
+                    break;
+                }
             }
 
-            int fromIndex = indexOfReverse(filesystem, seekRangeEnd, fileId);
-            if (fromIndex < 0) {
-                throw new IllegalStateException("FileBlock not found " + fileId);
-            }
-            if (seekRangeEnd != fromIndex) {
-                seekRangeEnd = fromIndex;
-            }
-
-            FileBlock moving = filesystem.get(fromIndex);
-
-            int freeSpaceIdx = indexOfFreeSpace(moving.size, fromIndex);
-            if (freeSpaceIdx < 0) {
-                continue;
-            }
-
-            relocate(moving, fromIndex, freeSpaceIdx);
+//            printFilesystem(files);
         }
 
+        files.sort(Comparator.comparing(File::getIndex));
+        printFilesystem(files);
+        
         long checksum = 0;
-        int idx = 0;
-        for (var f : filesystem) {
-            int end = idx + f.size;
-            while (idx < end) {
-                checksum += (idx * f.fileId);
-                idx++;
+        for (File file : files) {
+            for (int i=file.index; i< file.index + file.size; i++) {
+                checksum += (i * file.id);
             }
-            idx += f.freeSpaceAfter;
         }
 
         return checksum;
     }
 
-    int indexOfReverse(List<FileBlock> list, int start, long findFileId) {
-        for (int j = start; j >= 0; j--) {
-            if (list.get(j).fileId == findFileId) {
-                return j;
+    private void printFilesystem(List<File> files) {
+
+        int prevIdx = 0;
+        for (File file : files) {
+            int spaceCount = file.index - prevIdx;
+            for (int i= 0; i < spaceCount; i++) {
+                System.out.print('.');
+            }
+
+            prevIdx = file.index;
+            for (int i=file.index; i< file.index + file.size; i++) {
+                System.out.print(file.id);
+                prevIdx++;
             }
         }
-        return -1;
-    }
 
-    int indexOfFreeSpace(int size, int notBeyond) {
-
-        for (int i = 0; i < notBeyond; i++) {
-            FileBlock b = filesystem.get(i);
-            int freeSpace = b.freeSpaceAfter;
-            if (freeSpace == 1) {
-                seekRangeStart = i;
-            }
-
-            if (freeSpace >= size) {
-                return i;
-            }
-        }
-        return -1;
-    }
-
-    void printFilesystem() {
-        for (var f : filesystem) {
-            for (int i = 0; i < f.size; i++) {
-                System.out.print(f.fileId % 10);
-            }
-            for (int i = 0; i < f.freeSpaceAfter; i++) {
-                System.out.print(".");
-            }
-        }
         System.out.println();
     }
 
-    void relocate(FileBlock moveFile, int from, int to) {
-        FileBlock fromNeighbor = filesystem.get(from - 1);
-        FileBlock toNeighbor = filesystem.get(to);
+    static class File {
+        long id;
+        int size;
+        int index;
 
-        fromNeighbor.freeSpaceAfter += moveFile.size + moveFile.freeSpaceAfter;
-        moveFile.freeSpaceAfter = toNeighbor.freeSpaceAfter - moveFile.size;
-
-        if (moveFile.freeSpaceAfter < 0) {
-            throw new IllegalStateException();
+        public File(long id, int size, int index) {
+            this.id = id;
+            this.size = size;
+            this.index = index;
         }
 
-        toNeighbor.freeSpaceAfter = 0;
-
-        filesystem.remove(from);
-        filesystem.add(to + 1, moveFile);
-    }
-
-    static class FileBlock {
-        long fileId;
-        int size;
-        int freeSpaceAfter;
-
-        public FileBlock(long fileId, int size, int freeSpaceAfter) {
-            this.fileId = fileId;
-            this.size = size;
-            this.freeSpaceAfter = freeSpaceAfter;
+        public int getIndex() {
+            return index;
         }
     }
 
