@@ -1,29 +1,28 @@
 package org.tot.aoc;
 
-import org.junit.Assert;
-import org.junit.Test;
-import org.tot.helper.ResourceHelper;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-public class Day11Test {
+class Day11Test {
 
     @Test
-    public void testSample1() {
+    void testSample1() {
 
         var day = new Day11();
 
         List<Long> input = List.of(125L, 17L);
 
         long result = day.solvePuzzle2(input, 6);
-        Assert.assertEquals(22, result);
+        Assertions.assertEquals(22, result);
 
         result = day.solvePuzzle2(input, 25);
-        Assert.assertEquals(55312, result);
+        Assertions.assertEquals(55312, result);
     }
 
     @Test
-    public void testSolution1() {
+    void testSolution1() {
 
         var day = new Day11();
 
@@ -31,11 +30,11 @@ public class Day11Test {
 
         long result = day.solvePuzzle2(input, 25);
 
-        Assert.assertEquals(175006, result);
+        Assertions.assertEquals(175006, result);
     }
 
     @Test
-    public void testSolution2() {
+    void testSolution2() {
 
         var day = new Day11();
 
@@ -43,7 +42,7 @@ public class Day11Test {
 
         long result = day.solvePuzzle2(input, 75);
 
-        Assert.assertEquals(207961583799296L, result);
+        Assertions.assertEquals(207961583799296L, result);
     }
 
 }

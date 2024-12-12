@@ -1,14 +1,14 @@
 package org.tot.aoc.grid;
 
-import org.junit.Test;
-
 import java.util.List;
-import org.junit.Assert;
 
-public class StringGridTest {
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+
+class StringGridTest {
 
     @Test
-    public void testIterator() {
+    void testIterator() {
 
         StringGrid grid = new StringGrid(List.of(
                 "ABCDEF",
@@ -22,7 +22,7 @@ public class StringGridTest {
         for (Point p : grid) {
             collector.append(grid.get(p));
         }
-        Assert.assertEquals("ABCDEFGHIJKLMNOPQRSTUVWY", collector.toString());
+        Assertions.assertEquals("ABCDEFGHIJKLMNOPQRSTUVWY", collector.toString());
 
     }
 

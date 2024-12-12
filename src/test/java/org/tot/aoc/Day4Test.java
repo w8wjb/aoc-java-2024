@@ -1,15 +1,15 @@
 package org.tot.aoc;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.tot.helper.ResourceHelper;
 
 import java.util.List;
 
-public class Day4Test {
+class Day4Test {
 
     @Test
-    public void testSample1() {
+    void testSample1() {
 
         List<String> lines = ResourceHelper.loadLinesFromFile("Day4/sample1.txt");
 
@@ -17,22 +17,22 @@ public class Day4Test {
 
         int result = day.solvePuzzle1(lines);
 
-        Assert.assertEquals(18, result);
+        Assertions.assertEquals(18, result);
     }
 
     @Test
-    public void testSolution1() {
+    void testSolution1() {
         List<String> lines = ResourceHelper.loadLinesFromFile("Day4/input1.txt");
 
         var day = new Day4();
 
         int result = day.solvePuzzle1(lines);
 
-        Assert.assertEquals(2514, result);
+        Assertions.assertEquals(2514, result);
     }
 
     @Test
-    public void testSample2() {
+    void testSample2() {
 
         List<String> lines = ResourceHelper.loadLinesFromFile("Day4/sample1.txt");
 
@@ -40,11 +40,11 @@ public class Day4Test {
 
         int result = day.solvePuzzle2(lines);
 
-        Assert.assertEquals(9, result);
+        Assertions.assertEquals(9, result);
     }
 
     @Test
-    public void testSolution2() {
+    void testSolution2() {
 
         List<String> lines = ResourceHelper.loadLinesFromFile("Day4/input1.txt");
 
@@ -52,7 +52,7 @@ public class Day4Test {
 
         int result = day.solvePuzzle2(lines);
 
-        Assert.assertEquals(1888, result);
+        Assertions.assertEquals(1888, result);
     }
 
 }

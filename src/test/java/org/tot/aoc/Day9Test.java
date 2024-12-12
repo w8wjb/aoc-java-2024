@@ -1,15 +1,15 @@
 package org.tot.aoc;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.tot.helper.ResourceHelper;
 
 import java.util.List;
 
-public class Day9Test {
+class Day9Test {
 
     @Test
-    public void testSample1() {
+    void testSample1() {
 
         List<String> lines = ResourceHelper.loadLinesFromFile("Day9/sample1.txt");
 
@@ -17,22 +17,22 @@ public class Day9Test {
 
         long result = day.solvePuzzle1(lines.get(0));
 
-        Assert.assertEquals(1928, result);
+        Assertions.assertEquals(1928, result);
     }
 
     @Test
-    public void testSolution1() {
+    void testSolution1() {
         List<String> lines = ResourceHelper.loadLinesFromFile("Day9/input1.txt");
 
         var day = new Day9();
 
         long result = day.solvePuzzle1(lines.get(0));
 
-        Assert.assertEquals(6200294120911L, result);
+        Assertions.assertEquals(6200294120911L, result);
     }
 
     @Test
-    public void testSample2() {
+    void testSample2() {
 
         List<String> lines = ResourceHelper.loadLinesFromFile("Day9/sample1.txt");
 
@@ -40,11 +40,11 @@ public class Day9Test {
 
         long result = day.solvePuzzle2(lines.get(0));
 
-        Assert.assertEquals(2858, result);
+        Assertions.assertEquals(2858, result);
     }
 
     @Test
-    public void testSolution2() {
+    void testSolution2() {
 
         List<String> lines = ResourceHelper.loadLinesFromFile("Day9/input1.txt");
 
@@ -52,7 +52,7 @@ public class Day9Test {
 
         long result = day.solvePuzzle2(lines.get(0));
 
-        Assert.assertEquals(6227018762750L, result);
+        Assertions.assertEquals(6227018762750L, result);
     }
 
 }
