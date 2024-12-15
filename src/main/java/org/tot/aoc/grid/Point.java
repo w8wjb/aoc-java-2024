@@ -34,6 +34,10 @@ public class Point extends Vector implements Comparable<Point> {
         return new Point(this.x - dx, this.y - dy);
     }
 
+    public Point times(long scalar) {
+        return new Point(this.x * scalar, this.y * scalar);
+    }
+
     @Override
     public int compareTo(Point that) {
         if (this.x == that.x) {

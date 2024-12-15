@@ -52,8 +52,42 @@ public class Vector {
         return new Vector(-this.x, -this.y);
     }
 
+    public Vector times(long scalar) {
+        return new Vector(this.x * scalar, this.y * scalar);
+    }
+
+
     @Override
     public String toString() {
         return String.format("%d,%d", x, y);
     }
+
+    public String asArrow() {
+        if (x > 0) {
+            if (y > 0) {
+                return "↘";
+            } else if (y < 0) {
+                return "↗";
+            } else {
+                return ">";
+            }
+        } else if (x < 0) {
+            if (y > 0) {
+                return "↙";
+            } else if (y < 0) {
+                return "↖";
+            } else {
+                return "<";
+            }
+        } else {
+            if (y > 0) {
+                return "v";
+            } else if (y < 0) {
+                return "^";
+            } else {
+                return "0";
+            }
+        }
+    }
+
 }

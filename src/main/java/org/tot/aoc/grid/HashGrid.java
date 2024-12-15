@@ -69,6 +69,7 @@ public class HashGrid<V> extends HashMap<Point, V>  implements Iterable<Point> {
 
     public HashGrid(Map<Point, V> points, V empty) {
         this.putAll(points);
+        this.empty = empty;
     }
 
     public V put(Point p, V v) {
@@ -80,7 +81,11 @@ public class HashGrid<V> extends HashMap<Point, V>  implements Iterable<Point> {
     }
 
     public V get(Point p) {
-        return Objects.requireNonNullElse(super.get(p), empty);
+        V value = super.get(p);
+        if (value == null) {
+            return empty;
+        }
+        return value;
     }
 
     public boolean isWithinBounds(Point p) {
