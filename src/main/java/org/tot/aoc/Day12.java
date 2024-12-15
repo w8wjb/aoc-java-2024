@@ -131,7 +131,7 @@ public class Day12 {
 
         final char plantType;
         final Point startPlant;
-        final HashGrid<Integer> regionGrid = new HashGrid<>();
+        final HashGrid<Integer> regionGrid = new HashGrid<>(null);
 
         public Region(char plantType, Point startPlant) {
             this.plantType = plantType;

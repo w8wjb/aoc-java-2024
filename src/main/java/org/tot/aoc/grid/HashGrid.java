@@ -11,8 +11,8 @@ public class HashGrid<V> extends HashMap<Point, V>  implements Iterable<Point> {
     public long maxY = 0;
     public V empty = null;
 
-    public HashGrid() {
-
+    public HashGrid(V empty) {
+        this.empty = empty;
     }
 
     public HashGrid(HashGrid<V> copy) {
@@ -41,10 +41,9 @@ public class HashGrid<V> extends HashMap<Point, V>  implements Iterable<Point> {
                 points.put(new Point(x,y), row[x]);
             }
         }
-        HashGrid<Character> grid = new HashGrid<>(points);
+        HashGrid<Character> grid = new HashGrid<>(points, empty);
         grid.maxY = rows.size() - 1L;
         grid.maxX = rows.get(0).length() - 1L;
-        grid.empty = empty;
         return grid;
     }
 
@@ -62,14 +61,13 @@ public class HashGrid<V> extends HashMap<Point, V>  implements Iterable<Point> {
                 points.put(new Point(x,y), value);
             }
         }
-        HashGrid<V> grid = new HashGrid<V>(points);
+        HashGrid<V> grid = new HashGrid<V>(points, empty);
         grid.maxY = rows.size() - 1L;
         grid.maxX = rows.get(0).length() - 1L;
-        grid.empty = empty;
         return grid;
     }
 
-    public HashGrid(Map<Point, V> points) {
+    public HashGrid(Map<Point, V> points, V empty) {
         this.putAll(points);
     }
 
