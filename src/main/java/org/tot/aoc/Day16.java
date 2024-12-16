@@ -10,60 +10,72 @@ import java.util.stream.Collectors;
 
 public class Day16 {
 
-    HashGrid<Character> grid = null;
+    HashGrid<Character> maze = null;
+    Point mazeStart = null;
+    Point mazeEnd = null;
 
-    Vector[] movements = new Vector[]{
+
+    static Vector[] movements = new Vector[]{
             Vector.N,
             Vector.E,
             Vector.S,
             Vector.W
     };
 
+    public int wrap(int value, int max) {
+        return ((value % max) + max) % max;
+    }
+
+    Vector rotate(Vector source, int quarterTurns) {
+        int offset = ArrayUtils.indexOf(movements, source);
+        return movements[wrap(offset + quarterTurns, movements.length)];
+    }
+
+    private void parseInput(List<String> input) {
+        maze = HashGrid.fromList(input);
+
+        for (var entry : maze.entrySet()) {
+            if (entry.getValue() == 'S') {
+                mazeStart = entry.getKey();
+            } else if (entry.getValue() == 'E') {
+                mazeEnd = entry.getKey();
+            }
+        }
+
+        assert mazeStart != null;
+        assert mazeEnd != null;
+    }
 
     public int solvePuzzle1(List<String> input) {
 
-        grid = HashGrid.fromList(input);
+        parseInput(input);
 
-        Point start = null;
-        for (var entry : grid.entrySet()) {
-            if (entry.getValue() == 'S') {
-                start = entry.getKey();
-            }
-        }
-        assert start != null;
-
-        List<Step> path = findPath(start);
-
-        for (var step : path) {
-            grid.put(step.point, step.heading.asArrow());
-        }
-        grid.print();
-
-
-        return path.get(path.size() - 1).accumCost;
+        Step lastStep = findLeastCostPath();
+        return lastStep.actualCost;
     }
 
-    List<Step> findPath(Point start) {
+    Step findLeastCostPath() {
 
         Set<Point> visited = new HashSet<>();
 
         PriorityQueue<Step> queue = new PriorityQueue<>();
-        queue.add(new Step(start, Vector.E));
-
+        queue.add(new Step(mazeStart, Vector.E));
 
         Step step;
         while ((step = queue.poll()) != null) {
+
+            char tileType = maze.get(step.point);
 
             if (visited.contains(step.point)) {
                 continue;
             }
             visited.add(step.point);
 
-            if (grid.get(step.point) == 'E') {
-                return step.path;
+            if (tileType == 'E') {
+                return step;
             }
 
-            List<Step> neighbors = findNeighbors(step);
+            List<Step> neighbors = findNeighbors(step, tileType);
             if (neighbors.isEmpty()) {
                 continue;
             }
@@ -79,83 +91,177 @@ public class Day16 {
 
         }
 
-        return Collections.emptyList();
+        return null;
     }
 
-    List<Step> findNeighbors(Step adjacentTo) {
+    List<Step> findNeighbors(Step adjacentTo, char tileType) {
 
-        int offset = ArrayUtils.indexOf(movements, adjacentTo.heading);
-        Vector cwHeading = movements[wrap(offset + 1, movements.length)];
-        Vector ccwHeading = movements[wrap(offset - 1, movements.length)];
 
-        List<Vector> headings = List.of(adjacentTo.heading, cwHeading, ccwHeading);
+        int rotateEnd = tileType == 'S' ? 2 : 1;
 
-        return headings
-                .stream()
-                .filter(h -> grid.get(adjacentTo.point.add(h)) != '#')
-                .map(h -> new Step(adjacentTo, h))
-                .collect(Collectors.toList());
+        List<Step> neighbors = new ArrayList<>();
 
+        for (int i = -1; i <= rotateEnd; i++) {
+            Vector heading = (i == 0) ? adjacentTo.heading : rotate(adjacentTo.heading, i);
+
+            char neighborType = maze.get(adjacentTo.point.add(heading));
+
+            if (neighborType != '#') {
+                Step neighbor = new Step(adjacentTo, heading, mazeEnd);
+                neighbors.add(neighbor);
+            }
+
+        }
+
+//        System.out.print(adjacentTo.heading.asArrow());
+//        System.out.print(": ");
+//        for (var neighbor: neighbors) {
+//            System.out.print(neighbor.heading.asArrow());
+//        }
+//        System.out.println();
+
+        return neighbors;
     }
 
-    public int wrap(int value, int max) {
-        return ((value % max) + max) % max;
+
+    public int solvePuzzle2(List<String> input) {
+
+        parseInput(input);
+
+        return findLeastCostTiles();
+    }
+
+    int findLeastCostTiles() {
+
+
+        Map<Step, Integer> visited = new HashMap<>();
+        Set<Point> bestPathTiles = new HashSet<>();
+        int leastTileCost = Integer.MAX_VALUE;
+//        Set<Point> visited = new HashSet<>();
+
+        PriorityQueue<Step> queue = new PriorityQueue<>();
+        queue.add(new Step(mazeStart, Vector.E));
+
+        Step step;
+        while ((step = queue.poll()) != null) {
+
+            System.out.println();
+            printPath(step);
+
+            char tileType = maze.get(step.point);
+
+            if (step.estimatedCost > leastTileCost) {
+                continue;
+            }
+
+            int prevCost = visited.getOrDefault(step, Integer.MAX_VALUE);
+            if (step.actualCost >= prevCost) {
+                if (step.actualCost == leastTileCost) {
+                    bestPathTiles.addAll(step.getPathPoints());
+                }
+                continue;
+            }
+            visited.put(step, step.actualCost);
+
+            if (tileType == 'E') {
+                leastTileCost = step.actualCost;
+                bestPathTiles.addAll(step.getPathPoints());
+            }
+
+            List<Step> neighbors = findNeighbors(step, tileType);
+            queue.addAll(neighbors);
+
+//            for (var neighbor : neighbors) {
+//                if (visited.contains(neighbor.point)) {
+//                    continue;
+//                }
+//
+//                queue.add(neighbor);
+//            }
+
+
+        }
+
+        return bestPathTiles.size();
+    }
+
+    private void printPath(Step end) {
+        var mazeCopy = new HashGrid<>(maze);
+        for (var step: end.path) {
+            mazeCopy.put(step.point, step.heading.asArrow());
+        }
+        mazeCopy.print();
     }
 
     private static class Step implements Comparable<Step> {
         Point point;
         Vector heading;
-        int accumCost;
-        List<Step> path;
+        int actualCost;
+        long estimatedCost;
+        List<Step> path = new ArrayList<>();
 
         public Step(Point point, Vector heading) {
             this.point = point;
             this.heading = heading;
-            this.accumCost = 0;
-            this.path = new ArrayList<>();
+            this.actualCost = 0;
+            this.estimatedCost = 0;
             this.path.add(this);
         }
 
-        public Step(Step from, Vector heading) {
+        public Step(Step from, Vector heading, Point mazeEnd) {
             this.point = from.point.add(heading);
             this.heading = heading;
 
             if (from.heading == heading) {
-                this.accumCost = from.accumCost + 1;
+                this.actualCost = from.actualCost + 1;
             } else {
-                this.accumCost = from.accumCost + 1001;
+                this.actualCost = from.actualCost + 1001;
             }
 
-            this.path = new ArrayList<>(from.path);
-            this.path.add(this);
+            this.estimatedCost = this.actualCost
+                    + (rotationDistance(this.point, mazeEnd) * 1000)
+                    + this.point.chessboardStepDistance(mazeEnd);
 
+            this.path.addAll(from.path);
+            this.path.add(this);
         }
+
+        List<Point> getPathPoints() {
+            return this.path
+                    .stream()
+                    .map(s -> s.point)
+                    .collect(Collectors.toList());
+        }
+
+        long rotationDistance(Vector from, Vector to) {
+            int fromOffset = ArrayUtils.indexOf(movements, from);
+            int toOffset = ArrayUtils.indexOf(movements, to);
+            return Math.abs(toOffset - fromOffset);
+        }
+
 
         @Override
         public int compareTo(Step that) {
-            return this.accumCost - that.accumCost;
+            return (int) (this.estimatedCost - that.estimatedCost);
         }
 
         @Override
         public boolean equals(Object o) {
+            if (this == o) return true;
             if (!(o instanceof Step)) return false;
-            Step step = (Step) o;
-            return Objects.equals(point, step.point);
+            Step that = (Step) o;
+            return this.point.equals(that.point)
+                    && this.heading.equals(that.heading);
         }
 
         @Override
         public int hashCode() {
-            return Objects.hashCode(point);
+            return Objects.hash(point, heading);
         }
 
+        @Override
+        public String toString() {
+            return String.format("%s %s", point, heading.asArrow());
+        }
     }
-
-    public int solvePuzzle2(List<String> input) {
-
-        int total = 0;
-
-
-        return total;
-    }
-
 }

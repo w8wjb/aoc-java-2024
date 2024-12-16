@@ -32,7 +32,7 @@ class Day16Test {
     }
 
     @Test
-    void testSample2() {
+    void testSample2_1() {
 
         List<String> lines = ResourceHelper.loadLinesFromFile("Day16/sample1.txt");
 
@@ -40,7 +40,19 @@ class Day16Test {
 
         int result = day.solvePuzzle2(lines);
 
-        Assertions.assertEquals(123, result);
+        Assertions.assertEquals(45, result);
+    }
+
+    @Test
+    void testSample2_2() {
+
+        List<String> lines = ResourceHelper.loadLinesFromFile("Day16/sample2.txt");
+
+        var day = new Day16();
+
+        int result = day.solvePuzzle2(lines);
+
+        Assertions.assertEquals(64, result);
     }
 
     @Test

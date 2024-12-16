@@ -2,9 +2,6 @@ package org.tot.aoc;
 
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
-import org.tot.aoc.grid.Point;
-import org.tot.aoc.grid.StringGrid;
-import org.tot.aoc.grid.Vector;
 
 import java.util.*;
 import java.util.stream.Collectors;
