@@ -62,30 +62,30 @@ public class Vector {
         return String.format("%d,%d", x, y);
     }
 
-    public String asArrow() {
+    public char asArrow() {
         if (x > 0) {
             if (y > 0) {
-                return "↘";
+                return '↘';
             } else if (y < 0) {
-                return "↗";
+                return '↗';
             } else {
-                return ">";
+                return '>';
             }
         } else if (x < 0) {
             if (y > 0) {
-                return "↙";
+                return '↙';
             } else if (y < 0) {
-                return "↖";
+                return '↖';
             } else {
-                return "<";
+                return '<';
             }
         } else {
             if (y > 0) {
-                return "v";
+                return 'v';
             } else if (y < 0) {
-                return "^";
+                return '^';
             } else {
-                return "0";
+                return '0';
             }
         }
     }
