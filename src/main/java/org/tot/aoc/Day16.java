@@ -96,7 +96,6 @@ public class Day16 {
 
     List<Step> findNeighbors(Step adjacentTo, char tileType) {
 
-
         int rotateEnd = tileType == 'S' ? 2 : 1;
 
         List<Step> neighbors = new ArrayList<>();
@@ -112,13 +111,6 @@ public class Day16 {
             }
 
         }
-
-//        System.out.print(adjacentTo.heading.asArrow());
-//        System.out.print(": ");
-//        for (var neighbor: neighbors) {
-//            System.out.print(neighbor.heading.asArrow());
-//        }
-//        System.out.println();
 
         return neighbors;
     }
@@ -137,7 +129,6 @@ public class Day16 {
         Map<Step, Integer> visited = new HashMap<>();
         Set<Point> bestPathTiles = new HashSet<>();
         int leastTileCost = Integer.MAX_VALUE;
-//        Set<Point> visited = new HashSet<>();
 
         PriorityQueue<Step> queue = new PriorityQueue<>();
         queue.add(new Step(mazeStart, Vector.E));
@@ -145,22 +136,17 @@ public class Day16 {
         Step step;
         while ((step = queue.poll()) != null) {
 
-            System.out.println();
-            printPath(step);
-
             char tileType = maze.get(step.point);
 
             if (step.estimatedCost > leastTileCost) {
                 continue;
             }
 
-            int prevCost = visited.getOrDefault(step, Integer.MAX_VALUE);
-            if (step.actualCost >= prevCost) {
-                if (step.actualCost == leastTileCost) {
-                    bestPathTiles.addAll(step.getPathPoints());
-                }
+            Integer prevCost = visited.get(step);
+            if (prevCost != null && step.actualCost > prevCost) {
                 continue;
             }
+
             visited.put(step, step.actualCost);
 
             if (tileType == 'E') {
@@ -170,15 +156,6 @@ public class Day16 {
 
             List<Step> neighbors = findNeighbors(step, tileType);
             queue.addAll(neighbors);
-
-//            for (var neighbor : neighbors) {
-//                if (visited.contains(neighbor.point)) {
-//                    continue;
-//                }
-//
-//                queue.add(neighbor);
-//            }
-
 
         }
 

@@ -64,7 +64,7 @@ class Day16Test {
 
         int result = day.solvePuzzle2(lines);
 
-        Assertions.assertEquals(5466, result);
+        Assertions.assertEquals(545, result);
     }
 
 }
