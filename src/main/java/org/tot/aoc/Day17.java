@@ -1,7 +1,6 @@
 package org.tot.aoc;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
@@ -18,24 +17,70 @@ public class Day17 {
     public long solvePuzzle2(List<String> input) {
 
 
-        var initialState = new ThreeBitComputer(input);
+        var computer = new ThreeBitComputer(input);
 
-        String target = Arrays.stream(initialState.program)
-                .mapToObj(String::valueOf)
-                .collect(Collectors.joining(","));
+        List<Integer> targetValues = Arrays
+                .stream(computer.program)
+                .boxed()
+                .collect(Collectors.toList());
 
-        initialState.A = 117440L;
-        String r1 = initialState.call();
+        Collections.reverse(targetValues);
 
-        for (long i = 0; i < 10000000; i++) {
-            var clone = new ThreeBitComputer(initialState);
-            clone.A = i;
 
-            String result = clone.call();
-            if (target.equals(result)) {
-                return i;
+//        for (int i = 0; i < 28; i++) {
+//            computer.reset();
+//            computer.A = i;
+//            System.out.printf("%d %s%n", i, computer.call());
+//        }
+
+
+        long lastInput = 0;
+        for (int targetValue : targetValues) {
+
+            long inputBase = lastInput << 3;
+            boolean found = false;
+
+            for (long i = inputBase; i < inputBase + 8; i++) {
+                computer.reset();
+                computer.A = i;
+
+                String seq = computer.call();
+
+                long result = computer.B % 8;
+                if (result == targetValue) {
+                    lastInput = i;
+                    found = true;
+                    break;
+                }
             }
+
+            if (found) {
+                continue;
+            }
+            throw new IllegalStateException("No result found");
+
         }
+
+
+//        Map<Integer, Integer> outputMap = new HashMap<>();
+
+//        for (int i = 0; i < 8; i++) {
+//            computer.reset();
+//            computer.A = i;
+//
+//            String output = computer.call();
+//            System.out.printf("%d -> %s%n", i, output);
+//            outputMap.put(Integer.parseInt(output), i);
+//        }
+
+//        long A = 0;
+//        for (int j=computer.program.length - 1; j >= 0; j--) {
+//            int expectedOutput = computer.program[j];
+//            int source = outputMap.get(expectedOutput);
+//
+//            A <<= 3;
+//            A |= source;
+//        }
 
         return 0;
     }
@@ -71,6 +116,7 @@ public class Day17 {
                         program = Arrays.stream(parts[1].split(","))
                                 .mapToInt(Integer::parseInt)
                                 .toArray();
+                        break;
                     default:
                         break;
                 }
@@ -87,6 +133,13 @@ public class Day17 {
             this.output = new StringBuilder();
         }
 
+        void reset() {
+            A = 0;
+            B = 0;
+            C = 0;
+            i = 0;
+            output = new StringBuilder();
+        }
 
         @Override
         public String call() {
