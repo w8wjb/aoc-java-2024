@@ -9,9 +9,17 @@ import java.util.stream.Collectors;
 
 public class Day18 {
 
-    HashGrid<Character> maze = new HashGrid<>('.');
-    Point mazeStart = new Point(0, 0);
-    Point mazeEnd;
+
+    final HashGrid<Character> maze;
+    final Point mazeStart = new Point(0, 0);
+    final Point mazeEnd;
+
+    Day18(long maxX, long maxY) {
+        maze = new HashGrid<>('.');
+        maze.maxX = maxX;
+        maze.maxY = maxY;
+        mazeEnd = new Point(maxX, maxY);
+    }
 
     List<Point> parseInput(List<String> input) {
         return input.stream().map(line -> {
@@ -24,16 +32,23 @@ public class Day18 {
                 .collect(Collectors.toList());
     }
 
-    public int solvePuzzle1(List<String> input, long maxX, long maxY, int fallen) {
+    public int solvePuzzle1(List<String> input, int fallen) {
 
         List<Point> fallingBytes = parseInput(input);
 
+
         Set<Point> corrupt = new HashSet<>(fallingBytes.subList(0, fallen));
 
-        maze.maxX = maxX;
-        maze.maxY = maxY;
-        mazeEnd = new Point(maxX, maxY);
+        List<Step> path = findShortestPath(corrupt);
 
+        if (path.isEmpty()) {
+            return -1;
+        }
+        return path.size() - 1;
+
+    }
+
+    List<Step> findShortestPath(Set<Point> corrupt) {
 
         Set<Point> visited = new HashSet<>();
 
@@ -48,7 +63,7 @@ public class Day18 {
             visited.add(step.point);
 
             if (step.point.equals(mazeEnd)) {
-                return step.path.size() - 1;
+                return step.path;
             }
 
             List<Step> neighbors = findNeighbors(step, corrupt);
@@ -61,21 +76,32 @@ public class Day18 {
 
         }
 
-        return -1;
+        return Collections.emptyList();
     }
 
 
-    public String solvePuzzle2(List<String> input, long maxX, long maxY, int fallen) {
+    public String solvePuzzle2(List<String> input, int fallen) {
 
         List<Point> fallingBytes = parseInput(input);
 
+        Set<Point> lastPath = new HashSet<>();
+
         for (int i = fallen; i < fallingBytes.size(); i++) {
-            int steps = solvePuzzle1(input, maxX, maxY, i);
-            if (steps == -1) {
-                return fallingBytes.get(i - 1).toString();
+            Point newByte = fallingBytes.get(i);
+
+            // Don't bother checking falling bytes that did not land on the path
+            if (lastPath.isEmpty() || lastPath.contains(newByte)) {
+
+                Set<Point> corrupt = new HashSet<>(fallingBytes.subList(0, i + 1));
+                List<Step> path = findShortestPath(corrupt);
+
+                if (path.isEmpty()) {
+                    return newByte.toString();
+                }
+                lastPath = path.stream().map(Step::getPoint).collect(Collectors.toSet());
+
             }
         }
-
 
         return "";
     }
@@ -120,6 +146,7 @@ public class Day18 {
 
     static class Step implements Comparable<Step> {
 
+
         Point point;
         int actualCost;
         long estimatedCost;
@@ -141,6 +168,10 @@ public class Day18 {
             this.estimatedCost = this.actualCost
                     + this.point.chessboardStepDistance(mazeEnd);
 
+        }
+
+        public Point getPoint() {
+            return point;
         }
 
         @Override

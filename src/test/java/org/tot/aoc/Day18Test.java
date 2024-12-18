@@ -13,9 +13,9 @@ class Day18Test {
 
         List<String> lines = ResourceHelper.loadLinesFromFile("Day18/sample1.txt");
 
-        var day = new Day18();
+        var day = new Day18(6, 6);
 
-        int result = day.solvePuzzle1(lines, 6, 6, 12);
+        int result = day.solvePuzzle1(lines, 12);
 
         Assertions.assertEquals(22, result);
     }
@@ -24,9 +24,9 @@ class Day18Test {
     void testSolution1() {
         List<String> lines = ResourceHelper.loadLinesFromFile("Day18/input1.txt");
 
-        var day = new Day18();
+        var day = new Day18(70, 70);
 
-        int result = day.solvePuzzle1(lines, 70, 70, 1024);
+        int result = day.solvePuzzle1(lines, 1024);
 
         Assertions.assertEquals(248, result);
     }
@@ -36,9 +36,9 @@ class Day18Test {
 
         List<String> lines = ResourceHelper.loadLinesFromFile("Day18/sample1.txt");
 
-        var day = new Day18();
+        var day = new Day18(6, 6);
 
-        String result = day.solvePuzzle2(lines, 6, 6, 12);
+        String result = day.solvePuzzle2(lines, 12);
 
         Assertions.assertEquals("6,1", result);
     }
@@ -48,9 +48,9 @@ class Day18Test {
 
         List<String> lines = ResourceHelper.loadLinesFromFile("Day18/input1.txt");
 
-        var day = new Day18();
+        var day = new Day18(70, 70);
 
-        String result = day.solvePuzzle2(lines, 70, 70, 1024);
+        String result = day.solvePuzzle2(lines, 1024);
 
         Assertions.assertEquals("32,55", result);
     }
