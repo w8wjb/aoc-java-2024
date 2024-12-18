@@ -6,83 +6,53 @@ import java.util.stream.Collectors;
 
 public class Day17 {
 
+    private ThreeBitComputer computer = null;
+    private int[] targetSequence = null;
 
     public String solvePuzzle1(List<String> input) {
-
-
-        var computer = new ThreeBitComputer(input);
+        computer = new ThreeBitComputer(input);
         return computer.call();
     }
 
     public long solvePuzzle2(List<String> input) {
+        computer = new ThreeBitComputer(input);
 
+        // Store the sequence we need to match
+        targetSequence = computer.program;
 
-        var computer = new ThreeBitComputer(input);
+        // Once that's done, though, we're going to reprogram the computer and drop the last 2 opcodes
+        // These are the operations that make it output and loop. We don't need the output,
+        // and it needs to only run through the opcode sequence once.
+        computer.program = new int[targetSequence.length - 4];
+        System.arraycopy(targetSequence, 0, computer.program, 0, computer.program.length);
 
-        List<Integer> targetValues = Arrays
-                .stream(computer.program)
-                .boxed()
-                .collect(Collectors.toList());
+        return calcA(0, targetSequence.length - 1);
+    }
 
-        Collections.reverse(targetValues);
+    long calcA(long a, int segment) {
 
-
-//        for (int i = 0; i < 28; i++) {
-//            computer.reset();
-//            computer.A = i;
-//            System.out.printf("%d %s%n", i, computer.call());
-//        }
-
-
-        long lastInput = 0;
-        for (int targetValue : targetValues) {
-
-            long inputBase = lastInput << 3;
-            boolean found = false;
-
-            for (long i = inputBase; i < inputBase + 8; i++) {
-                computer.reset();
-                computer.A = i;
-
-                String seq = computer.call();
-
-                long result = computer.B % 8;
-                if (result == targetValue) {
-                    lastInput = i;
-                    found = true;
-                    break;
-                }
-            }
-
-            if (found) {
-                continue;
-            }
-            throw new IllegalStateException("No result found");
-
+        if (segment < 0) {
+            return a;
         }
 
+        // This is the number we want to get out of the computer
+        long targetOutput = targetSequence[segment];
 
-//        Map<Integer, Integer> outputMap = new HashMap<>();
+        for (int i = 0; i < 8; i++) {
 
-//        for (int i = 0; i < 8; i++) {
-//            computer.reset();
-//            computer.A = i;
-//
-//            String output = computer.call();
-//            System.out.printf("%d -> %s%n", i, output);
-//            outputMap.put(Integer.parseInt(output), i);
-//        }
+            long input = (a << 3) + i;
+            long output = computer.calc(input);
 
-//        long A = 0;
-//        for (int j=computer.program.length - 1; j >= 0; j--) {
-//            int expectedOutput = computer.program[j];
-//            int source = outputMap.get(expectedOutput);
-//
-//            A <<= 3;
-//            A |= source;
-//        }
+            if (targetOutput == output) {
+                // We have a possible input candidate, lets keep moving left
+                input = calcA(input, segment - 1);
+                if (input != -1) {
+                    return input;
+                }
+            }
+        }
 
-        return 0;
+        return -1;
     }
 
     static class ThreeBitComputer implements Callable<String> {
@@ -143,8 +113,11 @@ public class Day17 {
 
         @Override
         public String call() {
+            runProgram();
+            return output.toString();
+        }
 
-
+        private void runProgram() {
             for (i = 0; i < program.length - 1; i += 2) {
 
                 int opcode = program[i];
@@ -180,9 +153,14 @@ public class Day17 {
                 }
 
             }
+        }
 
-
-            return output.toString();
+        long calc(long a) {
+            this.A = a;
+            this.B = 0;
+            this.C = 0;
+            runProgram();
+            return B % 8;
         }
 
         void adv(long operand) {

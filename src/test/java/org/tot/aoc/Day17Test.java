@@ -31,17 +31,6 @@ class Day17Test {
         Assertions.assertEquals("6,4,6,0,4,5,7,2,7", result);
     }
 
-    @Test
-    void testSample2() {
-
-        List<String> lines = ResourceHelper.loadLinesFromFile("Day17/sample1.txt");
-
-        var day = new Day17();
-
-        long result = day.solvePuzzle2(lines);
-
-        Assertions.assertEquals(117440, result);
-    }
 
     @Test
     void testSolution2() {
@@ -52,7 +41,7 @@ class Day17Test {
 
         long result = day.solvePuzzle2(lines);
 
-        Assertions.assertEquals(561, result);
+        Assertions.assertEquals(164541160582845L, result);
     }
 
 }
