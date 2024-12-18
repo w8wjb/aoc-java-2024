@@ -9,12 +9,7 @@ import java.util.*;
 
 public class Day12 {
 
-    static final Vector[] sides = new Vector[] {
-            Vector.N,
-            Vector.E,
-            Vector.S,
-            Vector.W
-    };
+    static final Vector[] sides = Vector.CARDINAL;
 
     public int solvePuzzle1(List<String> input) {
 

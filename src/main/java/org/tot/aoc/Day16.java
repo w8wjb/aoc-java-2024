@@ -14,21 +14,13 @@ public class Day16 {
     Point mazeStart = null;
     Point mazeEnd = null;
 
-
-    static Vector[] movements = new Vector[]{
-            Vector.N,
-            Vector.E,
-            Vector.S,
-            Vector.W
-    };
-
     public int wrap(int value, int max) {
         return ((value % max) + max) % max;
     }
 
     Vector rotate(Vector source, int quarterTurns) {
-        int offset = ArrayUtils.indexOf(movements, source);
-        return movements[wrap(offset + quarterTurns, movements.length)];
+        int offset = ArrayUtils.indexOf(Vector.CARDINAL, source);
+        return Vector.CARDINAL[wrap(offset + quarterTurns, Vector.CARDINAL.length)];
     }
 
     private void parseInput(List<String> input) {
@@ -211,8 +203,8 @@ public class Day16 {
         }
 
         long rotationDistance(Vector from, Vector to) {
-            int fromOffset = ArrayUtils.indexOf(movements, from);
-            int toOffset = ArrayUtils.indexOf(movements, to);
+            int fromOffset = ArrayUtils.indexOf(Vector.CARDINAL, from);
+            int toOffset = ArrayUtils.indexOf(Vector.CARDINAL, to);
             return Math.abs(toOffset - fromOffset);
         }
 

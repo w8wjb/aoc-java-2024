@@ -25,7 +25,7 @@ public class Day4 {
         for (Point start : grid) {
 
             // Check all the directions around this point, N, NE, E, SE, S, SW, W, NW
-            for (Vector direction : Vector.ADJACENT_MOVES) {
+            for (Vector direction : Vector.ORDINAL) {
 
                 // Create a 'p' variable to hold our current place. It starts at the center.
                 Point p = start;

@@ -12,8 +12,9 @@ public class Vector {
     public static final Vector S = new Vector(0, 1);
     public static final Vector SE = new Vector(1, 1);
 
-    public static final Vector[] ADJACENT_MOVES = {N, NE, E, SE, S, SW, W, NW};
-
+    // https://en.wikipedia.org/wiki/Cardinal_direction
+    public static final Vector[] CARDINAL = {N, E, S, W};
+    public static final Vector[] ORDINAL = {N, NE, E, SE, S, SW, W, NW};
 
     public final long x;
     public final long y;
@@ -43,8 +44,8 @@ public class Vector {
     @Override
     public int hashCode() {
         int hash = 7;
-        hash = 31 * hash + (int)x;
-        hash = 31 * hash + (int)y;
+        hash = 31 * hash + (int) x;
+        hash = 31 * hash + (int) y;
         return hash;
     }
 

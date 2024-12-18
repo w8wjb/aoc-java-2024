@@ -132,7 +132,7 @@ public class Day14 {
                     continue;
                 }
                 visited.add(p);
-                for (var dir : Vector.ADJACENT_MOVES) {
+                for (var dir : Vector.ORDINAL) {
                     Point adjacent = p.add(dir);
                     if (grid.get(adjacent) == '#') {
                         queue.add(adjacent);

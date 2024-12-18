@@ -11,12 +11,6 @@ public class Day10 {
 
     HashGrid<Integer> grid;
 
-    final Vector[] movements = new Vector[] {
-            Vector.N,
-            Vector.E,
-            Vector.S,
-            Vector.W
-    };
 
     public long solvePuzzle1(List<String> input) {
 
@@ -65,7 +59,7 @@ public class Day10 {
 
             int uphill = height + 1;
 
-            for (var dir : movements) {
+            for (var dir : Vector.CARDINAL) {
                 Point adjacent = p.add(dir);
                 if (grid.get(adjacent) == uphill) {
                     queue.add(adjacent);
@@ -110,7 +104,7 @@ public class Day10 {
 
         int uphill = height + 1;
 
-        for (Vector dir : movements) {
+        for (Vector dir : Vector.CARDINAL) {
             Point adjacent = from.add(dir);
             if (grid.get(adjacent) == uphill) {
                 walkTrailDFS(adjacent, score);
