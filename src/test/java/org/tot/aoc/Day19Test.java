@@ -15,7 +15,7 @@ class Day19Test {
 
         var day = new Day19();
 
-        int result = day.solvePuzzle1(lines);
+        long result = day.solvePuzzle1(lines);
 
         Assertions.assertEquals(6, result);
     }
@@ -26,7 +26,7 @@ class Day19Test {
 
         var day = new Day19();
 
-        int result = day.solvePuzzle1(lines);
+        long result = day.solvePuzzle1(lines);
 
         Assertions.assertEquals(360, result);
     }
@@ -38,7 +38,7 @@ class Day19Test {
 
         var day = new Day19();
 
-        int result = day.solvePuzzle2(lines);
+        long result = day.solvePuzzle2(lines);
 
         Assertions.assertEquals(16, result);
     }
@@ -50,9 +50,9 @@ class Day19Test {
 
         var day = new Day19();
 
-        int result = day.solvePuzzle2(lines);
+        long result = day.solvePuzzle2(lines);
 
-        Assertions.assertEquals(561, result);
+        Assertions.assertEquals(577474410989846L, result);
     }
 
 }

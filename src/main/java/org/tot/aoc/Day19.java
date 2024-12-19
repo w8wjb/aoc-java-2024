@@ -1,14 +1,13 @@
 package org.tot.aoc;
 
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class Day19 {
 
     Set<String> allTowels = new TreeSet<>();
     List<String> desiredDesigns = new ArrayList<>();
 
-    Map<String, Integer> patternCounts = new HashMap<>();
+    Map<String, Long> patternCounts = new HashMap<>();
 
     void parseInput(List<String> input) {
 
@@ -27,18 +26,17 @@ public class Day19 {
 
     }
 
-    public int solvePuzzle1(List<String> input) {
+    public long solvePuzzle1(List<String> input) {
 
         parseInput(input);
         discardUnnecessaryTowels();
 
-        AtomicInteger possible = new AtomicInteger(0);
+        long possible = 0;
         for (String design : desiredDesigns) {
-            findTowels(design, allTowels, possible, false);
+            possible += findTowels(design, allTowels, true);
         }
 
-
-        return possible.get();
+        return possible;
     }
 
     void discardUnnecessaryTowels() {
@@ -51,68 +49,57 @@ public class Day19 {
 
             Set<String> withoutMe = new TreeSet<>(allTowels);
             withoutMe.remove(towel);
-            AtomicInteger possible = new AtomicInteger(0);
-            if (findTowels(towel, withoutMe, possible, false)) {
+            if (findTowels(towel, withoutMe, true) > 0) {
                 itor.remove();
             }
 
         }
         allTowels = towelsTemp;
+        patternCounts.clear();
     }
 
-    boolean findTowels(String design, Set<String> availableTowels, AtomicInteger possible, boolean all) {
+    long findTowels(String design, Set<String> availableTowels, boolean first) {
 
+        Long memoCount = patternCounts.get(design);
+        if (memoCount != null) {
+            return memoCount;
+        }
 
-        Integer memoCount = null;
+        long combinationCount = 0;
 
         for (String towel : availableTowels) {
             if (design.startsWith(towel)) {
                 String subdesign = design.substring(towel.length());
                 if (subdesign.isEmpty()) {
-                    possible.incrementAndGet();
-                    if (all) {
-                        continue;
-                    }
-                    return true;
+                    combinationCount += 1;
+                } else {
+                    long count = findTowels(subdesign, availableTowels, first);
+                    combinationCount += count;
                 }
 
-                memoCount = patternCounts.get(subdesign);
-                if (memoCount != null) {
-                    possible.getAndAdd(memoCount);
-                    if (all) {
-                        continue;
-                    }
-                    return true;
+                if (first && combinationCount > 0) {
+                    return combinationCount;
                 }
-
-                boolean success = findTowels(subdesign, availableTowels, possible, all);
-                if (success) {
-                    int count = patternCounts.getOrDefault(subdesign, 0);
-                    patternCounts.put(subdesign, count + 1);
-                    if (all) {
-                        continue;
-                    }
-                    return true;
-                }
-
             }
         }
 
-        return false;
+        patternCounts.put(design, combinationCount);
+
+        return combinationCount;
     }
 
 
-    public int solvePuzzle2(List<String> input) {
+    public long solvePuzzle2(List<String> input) {
 
         parseInput(input);
 
-        AtomicInteger possible = new AtomicInteger(0);
+        long possible = 0;
         for (String design : desiredDesigns) {
-            findTowels(design, allTowels, possible, true);
+            possible += findTowels(design, allTowels, false);
         }
 
 
-        return possible.get();
+        return possible;
     }
 
 }
