@@ -46,7 +46,7 @@ public class Point extends Vector implements Comparable<Point> {
         return (int)(this.x - that.x);
     }
 
-    public long chessboardStepDistance(Point to) {
+    public long chessboardStepDistance(Vector to) {
         long dx = Math.abs(to.x - this.x);
         long dy = Math.abs(to.y - this.y);
         return  dx + dy;

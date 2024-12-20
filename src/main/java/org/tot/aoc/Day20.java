@@ -14,6 +14,13 @@ public class Day20 {
     Point mazeStart = new Point(0, 0);
     Point mazeEnd;
 
+    final int picosecondSavings;
+    final int maxCheatLength;
+
+    public Day20(int picosecondSavings, int maxCheatLength) {
+        this.picosecondSavings = picosecondSavings;
+        this.maxCheatLength = maxCheatLength;
+    }
 
     private void parseInput(List<String> input) {
 
@@ -38,10 +45,12 @@ public class Day20 {
         assert mazeEnd != null;
     }
 
-    public int solvePuzzle1(List<String> input, int picoseconds) {
+    public int solvePuzzle1(List<String> input) {
 
         parseInput(input);
-        List<Step> path = findShortestPath();
+
+        List<Vector> kernel = generateKernel(maxCheatLength);
+        List<Step> path = findShortestPath(kernel);
 
         Map<Point, Step> stepLookup = path.stream()
                 .collect(Collectors.toMap(
@@ -50,31 +59,45 @@ public class Day20 {
                 ));
 
 
-        int cheatCount = 0;
+        int[] cheatCounts = new int[path.size()];
         for (Step step : path) {
 
             for (Point cheatPoint : step.cheats) {
                 Step cheatTo = stepLookup.get(cheatPoint);
 
-                int savings = cheatTo.actualCost - step.actualCost - 2;
+                int distance = (int) step.point.chessboardStepDistance(cheatPoint);
+                int savings = cheatTo.actualCost - step.actualCost - distance;
 
-                if (savings >= picoseconds) {
-                    cheatCount++;
+                if (savings >= picosecondSavings) {
+                    cheatCounts[savings]++;
                 }
 
             }
-
         }
 
-        return cheatCount;
+        return Arrays.stream(cheatCounts).sum();
     }
 
-    public int solvePuzzle2(List<String> input) {
 
-        return 0;
+    private List<Vector> generateKernel(int maxDistance) {
+
+        List<Vector> kernel = new ArrayList<>();
+
+        Point center = new Point(0, 0);
+        for (int x = -maxDistance; x <= maxDistance; x++) {
+            for (int y = -maxDistance; y <= maxDistance; y++) {
+                Vector v = new Vector(x, y);
+                long distance = center.chessboardStepDistance(v);
+                if (distance > 0 && distance <= maxDistance) {
+                    kernel.add(v);
+                }
+            }
+        }
+        return kernel;
     }
 
-    List<Step> findShortestPath() {
+
+    List<Step> findShortestPath(List<Vector> kernel) {
 
         Set<Point> visited = new HashSet<>();
 
@@ -96,18 +119,19 @@ public class Day20 {
                 Point neighborPoint = step.point.add(dir);
                 char neighborType = maze.get(neighborPoint);
 
-                if (neighborType == '#') {
-                    Point cheatPoint = neighborPoint.add(dir);
-                    if (maze.get(cheatPoint) == '.' || maze.get(cheatPoint) == 'E') {
-                        step.cheats.add(cheatPoint);
-                    }
-
-                } else {
+                if (neighborType != '#') {
                     Step neighbor = new Step(step, dir);
                     queue.add(neighbor);
                 }
+            }
 
 
+            for (Vector v : kernel) {
+                Point testPoint = step.point.add(v);
+                char testContents = maze.get(testPoint);
+                if (testContents == '.' || testContents == 'E') {
+                    step.cheats.add(testPoint);
+                }
             }
 
 

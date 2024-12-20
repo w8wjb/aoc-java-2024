@@ -13,9 +13,9 @@ class Day20Test {
 
         List<String> lines = ResourceHelper.loadLinesFromFile("Day20/sample1.txt");
 
-        var day = new Day20();
+        var day = new Day20(2, 2);
 
-        int result = day.solvePuzzle1(lines, 2);
+        int result = day.solvePuzzle1(lines);
 
         Assertions.assertEquals(44, result);
     }
@@ -25,9 +25,9 @@ class Day20Test {
 
         List<String> lines = ResourceHelper.loadLinesFromFile("Day20/sample1.txt");
 
-        var day = new Day20();
+        var day = new Day20(64, 2);
 
-        int result = day.solvePuzzle1(lines, 64);
+        int result = day.solvePuzzle1(lines);
 
         Assertions.assertEquals(1, result);
     }
@@ -36,9 +36,9 @@ class Day20Test {
     void testSolution1() {
         List<String> lines = ResourceHelper.loadLinesFromFile("Day20/input1.txt");
 
-        var day = new Day20();
+        var day = new Day20(100, 2);
 
-        int result = day.solvePuzzle1(lines, 100);
+        int result = day.solvePuzzle1(lines);
 
         Assertions.assertEquals(1378, result);
     }
@@ -46,13 +46,13 @@ class Day20Test {
     @Test
     void testSample2() {
 
-        List<String> lines = ResourceHelper.loadLinesFromFile("Day20/sample2.txt");
+        List<String> lines = ResourceHelper.loadLinesFromFile("Day20/sample1.txt");
 
-        var day = new Day20();
+        var day = new Day20(50, 20);
 
-        int result = day.solvePuzzle2(lines);
+        int result = day.solvePuzzle1(lines);
 
-        Assertions.assertEquals(48, result);
+        Assertions.assertEquals(285, result);
     }
 
     @Test
@@ -60,11 +60,11 @@ class Day20Test {
 
         List<String> lines = ResourceHelper.loadLinesFromFile("Day20/input1.txt");
 
-        var day = new Day20();
+        var day = new Day20(100, 20);
 
-        int result = day.solvePuzzle2(lines);
+        int result = day.solvePuzzle1(lines);
 
-        Assertions.assertEquals(102467299, result);
+        Assertions.assertEquals(975379, result);
     }
 
 }
