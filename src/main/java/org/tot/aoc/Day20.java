@@ -17,7 +17,7 @@ public class Day20 {
 
     private void parseInput(List<String> input) {
 
-        maze = new StringGrid(input);
+        maze = new StringGrid(input, '#');
 
         ListIterator<String> rows = input.listIterator();
         while (rows.hasNext()) {
@@ -98,9 +98,7 @@ public class Day20 {
 
                 if (neighborType == '#') {
                     Point cheatPoint = neighborPoint.add(dir);
-                    if (maze.isWithinBounds(cheatPoint)
-                            && (maze.get(cheatPoint) == '.'
-                            || maze.get(cheatPoint) == 'E')) {
+                    if (maze.get(cheatPoint) == '.' || maze.get(cheatPoint) == 'E') {
                         step.cheats.add(cheatPoint);
                     }
 

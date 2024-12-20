@@ -16,11 +16,17 @@ public class StringGrid implements Iterable<Point> {
     public final long minY = 0;
     public final long maxX;
     public final long maxY;
+    char empty = '.';
 
     public StringGrid(List<String> rows) {
+        this(rows, '.');
+    }
+
+    public StringGrid(List<String> rows, char empty) {
         this.rows = rows;
         this.maxY = rows.size() - 1L;
         this.maxX = rows.get(0).length() - 1L;
+        this.empty = empty;
     }
 
     /**
@@ -33,7 +39,7 @@ public class StringGrid implements Iterable<Point> {
     public char get(Point p) {
         // Bounds checking
         if (p.x < minX || p.y < minY || p.x > maxX || p.y > maxY) {
-            return '.';
+            return empty;
         }
         return rows.get((int) p.y).charAt((int) p.x);
     }
