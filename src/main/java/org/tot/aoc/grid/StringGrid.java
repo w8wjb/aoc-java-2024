@@ -11,7 +11,7 @@ import java.util.function.Consumer;
 public class StringGrid implements Iterable<Point> {
 
 
-    protected final List<String> rows;
+    public final List<String> rows;
     public final long minX = 0;
     public final long minY = 0;
     public final long maxX;
